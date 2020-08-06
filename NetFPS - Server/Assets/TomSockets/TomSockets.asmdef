@@ -1,0 +1,14 @@
+{
+    "name": "TomSockets",
+    "references": [
+        "GUID:11741bd0e7f74434cba13b1d88898191"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

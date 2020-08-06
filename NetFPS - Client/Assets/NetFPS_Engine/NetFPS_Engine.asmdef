@@ -1,0 +1,20 @@
+{
+    "name": "NetFPS_Engine",
+    "references": [
+        "GUID:a44f47cf3ada4435dbc516bad0bc86fe",
+        "GUID:1c73e6e1e2b784953a9212924dc002d1",
+        "GUID:bfacb3ca089124d95963e1ebe9a83ae5",
+        "GUID:5710c1f859f1945b6bc9b33cff6b43fc",
+        "GUID:d528c8c98d269ca44a06cd9624a03945",
+        "GUID:31c775580d5c8dd4e9b0ee742a9e4058",
+        "GUID:11741bd0e7f74434cba13b1d88898191"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
