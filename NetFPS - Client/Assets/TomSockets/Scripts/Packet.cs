@@ -12,7 +12,8 @@ public enum ServerPackets
     playerDisconnected,
     playerHealth,
     playerRespawned,
-    BroadcastPlayerState
+    BroadcastPlayerState,
+    PlayerShot
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -24,9 +25,9 @@ public enum ClientPackets
 
 public class Packet : IDisposable
 {
-    private List<byte> buffer;
-    private byte[] readableBuffer;
-    private int readPos;
+    public List<byte> buffer { get; private set; }
+    public byte[] readableBuffer { get; private set; }
+    public int readPos { get; private set; }
 
     /// <summary>Creates a new empty packet (without an ID).</summary>
     public Packet()
@@ -265,6 +266,24 @@ public class Packet : IDisposable
         else
         {
             throw new Exception("Could not read value of type 'int'!");
+        }
+    }
+
+    public short ReadInt16(bool _moveReadPos = true)
+    {
+        if (buffer.Count > readPos)
+        {
+            short _value = BitConverter.ToInt16(readableBuffer, readPos);
+
+            if (_moveReadPos)
+            {
+                readPos += 2;
+            }
+            return _value;
+        }
+        else
+        {
+            throw new Exception("Could not read value of type 'int 16'!");
         }
     }
 

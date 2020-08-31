@@ -4,7 +4,6 @@ using UnityEngine.Networking;
 
 public class AuthoritativeCharacter : MonoBehaviour
 {
-
     public float Speed { get { return speed; } }
     /// <summary>
     /// Controls how many inputs are needed before sending update command
@@ -15,14 +14,14 @@ public class AuthoritativeCharacter : MonoBehaviour
     /// Controls how many input updates are sent per second
     /// </summary>
     [SerializeField, Range(10, 50), Tooltip("In steps per second")]
-    int inputUpdateRate = 20;
+    int inputUpdateRate = 10;
     [HideInInspector, SerializeField, Range(5f, 15f)]
     float speed = 15f;
     [SerializeField, Range(1, 60), Tooltip("In steps per second")]
     public int interpolationDelay = 12;
 
     public static List<AuthoritativeCharacter> serverPlayers = new List<AuthoritativeCharacter>();
-    private Player myPlayer;
+    public Player myPlayer;
 
     /// <summary>
     /// shared state for this character across the entire network
@@ -38,10 +37,13 @@ public class AuthoritativeCharacter : MonoBehaviour
             _state = value;
         }
     }
+
+    [HideInInspector] public ServerCharacterShooter shooter;
+
     private CharacterState _state;
 
     IAuthCharStateHandler stateHandler;
-    public AuthCharServer server;
+    public ServerCharacter server;
 
     CharacterController charCtrl;
 
@@ -60,7 +62,7 @@ public class AuthoritativeCharacter : MonoBehaviour
     //SERVER ONLY
     public void OnStartServer()
     {
-        server = gameObject.GetComponent<AuthCharServer>();
+        server = gameObject.GetComponent<ServerCharacter>();
 
         //register for call backs to move player on server
         if (Server.packetHandlers.ContainsKey((int)ClientPackets.CmdMove) == false)
@@ -80,6 +82,8 @@ public class AuthoritativeCharacter : MonoBehaviour
     {
         serverPlayers.Remove(this);
     }
+
+
 
     /// <summary>
     /// move this character to a give location, from a calculated state

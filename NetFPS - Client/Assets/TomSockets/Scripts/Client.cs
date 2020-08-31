@@ -46,11 +46,7 @@ public class Client : MonoBehaviour
         //Autoconnect
         Logger.Logger.Log(Logger.LogModeOptions.Verbose, $"Auto connecting...");
         yield return new WaitForSeconds(.2f);
-        Logger.Logger.Log(Logger.LogModeOptions.Verbose, $"IP: 51.132.222.45");
-        yield return new WaitForSeconds(2);
         UIManager.instance.ConnectToServer();
-        Logger.Logger.Log(Logger.LogModeOptions.Verbose, $"Ping :: {UnityEngine.Random.Range(40,70).ToString()}ms");
-
     }
 
     private void OnApplicationQuit()
@@ -95,6 +91,7 @@ public class Client : MonoBehaviour
 
             if (!socket.Connected)
             {
+                
                 return;
             }
 
@@ -313,8 +310,6 @@ public class Client : MonoBehaviour
         {
             { (int)ServerPackets.welcome, ClientHandle.Welcome },
             { (int)ServerPackets.spawnPlayer, ClientHandle.SpawnPlayer },
-            //{ (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
-            //{ (int)ServerPackets.playerRotation, ClientHandle.PlayerRotation },
             { (int)ServerPackets.playerDisconnected, ClientHandle.PlayerDisconnected },
             { (int)ServerPackets.playerHealth, ClientHandle.PlayerHealth },
             { (int)ServerPackets.playerRespawned, ClientHandle.PlayerRespawned }

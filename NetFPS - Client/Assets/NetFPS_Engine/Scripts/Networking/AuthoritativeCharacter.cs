@@ -1,10 +1,14 @@
-using UnityEngine;
-using UnityEngine.Networking;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
+
+/// <summary>
+/// main character component for server authoritative characters
+/// </summary>
 public class AuthoritativeCharacter : MonoBehaviour
 {
-    public bool isLocalPlayer = false;  
+    public bool isLocalPlayer = false;
 
     public float Speed { get { return speed; } }
     public float LookSpeed { get { return lookSpeed; } }
@@ -17,7 +21,7 @@ public class AuthoritativeCharacter : MonoBehaviour
     /// Controls how many input updates are sent per second
     /// </summary>
     [SerializeField, Range(10, 50), Tooltip("In steps per second")]
-    int inputUpdateRate = 20;
+    int inputUpdateRate = 10;
     [HideInInspector, SerializeField, Range(5f, 15f)]
     float speed = 15f;
     [HideInInspector]
@@ -25,8 +29,14 @@ public class AuthoritativeCharacter : MonoBehaviour
     [SerializeField, Range(1, 60), Tooltip("In steps per second")]
     public int interpolationDelay = 12;//time from one interpolcation to the next
 
+    [HideInInspector]
+    public CharacterShooter shooter;
+
 
     public static List<AuthoritativeCharacter> observers = new List<AuthoritativeCharacter>();
+
+    public Vector3 previousPosition;
+    public Vector3 newPosition;
     /// <summary>
     /// shared state for this character across the entire network
     /// </summary>
@@ -43,12 +53,12 @@ public class AuthoritativeCharacter : MonoBehaviour
         }
     }
     private CharacterState _state;
-    
+
     IAuthCharStateHandler stateHandler;
 
     private CharacterController charCtrl;
 
-    private PlayerInfo player
+    public PlayerInfo player
     {
         get
         {
@@ -71,6 +81,12 @@ public class AuthoritativeCharacter : MonoBehaviour
             Client.packetHandlers.Add((int)ServerPackets.BroadcastPlayerState, HandlePlayerServerUpdate);
         }
 
+        //get a callback when the server state of the player changes
+        if (Client.packetHandlers.ContainsKey((int)ServerPackets.PlayerShot) == false)
+        {
+            Client.packetHandlers.Add((int)ServerPackets.PlayerShot, HandlePlayerShot);
+        }
+
         //get the position of the player and make it the active position
         state = new CharacterState
         {
@@ -87,13 +103,13 @@ public class AuthoritativeCharacter : MonoBehaviour
         //REMOTE PLAYER ONLY
         if (!isLocalPlayer)
         {
-            stateHandler = gameObject.GetComponent<AuthCharObserver>();//used to observer the state of this player on the server
+            stateHandler = gameObject.GetComponent<RemoteCharacterObsever>();//used to observer the state of this player on the server
             return;
         }
 
         //LOCAL PLAYER ONLY
         GetComponentInChildren<Renderer>().material.color = Color.green;//make our character green
-        stateHandler = gameObject.GetComponent<AuthCharPredictor>();//used to predict the state of our local player
+        stateHandler = gameObject.GetComponent<CharacterPredictor>();//used to predict the state of our local player
         gameObject.GetComponent<AuthCharInput>();//used to make local input and transmit it to server
     }
 
@@ -125,6 +141,7 @@ public class AuthoritativeCharacter : MonoBehaviour
         transform.rotation = overrideState.rotation;//save the rotation
     }
 
+    #region Local Hanlders
     /// <summary>
     /// called on the server after a state update
     /// called on clients when the server state changes
@@ -135,25 +152,6 @@ public class AuthoritativeCharacter : MonoBehaviour
         //use the server observer to sync to the server state
         if (stateHandler != null)
             stateHandler.OnServerUpdate(state);
-    }
-
-    public static void HandlePlayerServerUpdate(Packet _packet)
-    {
-        int _playerID = _packet.ReadInt();
-        for (int i = 0; i < observers.Count; i++)
-        {
-            if (observers[i].player.id == _playerID)
-            {
-                CharacterState newState = new CharacterState();
-                newState.Readpacket(_packet);
-                //save the new state
-                observers[i].state = newState;
-
-                //if (observers[i].isLocalPlayer)
-                //    Logger.Logger.Log(Logger.LogModeOptions.Verbose, $"Server Override -- Timestamp :: {newState.moveNum}");
-                return;
-            }
-        }
     }
 
     //send the inputs to the server
@@ -174,4 +172,40 @@ public class AuthoritativeCharacter : MonoBehaviour
             ClientSend.SendTCPData(_packet);
         }
     }
+
+    #endregion
+
+    #region Static Handlers
+    public static void HandlePlayerServerUpdate(Packet _packet)
+    {
+        int _playerID = _packet.ReadInt();
+        for (int i = 0; i < observers.Count; i++)
+        {
+            if (observers[i].player.id == _playerID)
+            {
+                CharacterState newState = new CharacterState();
+                newState.Readpacket(_packet);
+                //save the new state
+                observers[i].state = newState;
+
+                //if (observers[i].isLocalPlayer)
+                //    Logger.Logger.Log(Logger.LogModeOptions.Verbose, $"Server Override -- Timestamp :: {newState.moveNum}");
+                return;
+            }
+        }
+    }
+
+    public static void HandlePlayerShot(Packet _packet)
+    {
+        int shootingPlayer = _packet.ReadInt();
+        int shotPlayer = _packet.ReadInt();
+
+        for (int i = 0; i < observers.Count; i++)
+        {
+            if(observers[i].shooter)
+            observers[i].shooter.PlayerShot(shootingPlayer, shotPlayer);
+        }
+    }
+
+    #endregion
 }

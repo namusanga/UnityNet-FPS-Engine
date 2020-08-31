@@ -109,7 +109,7 @@ public struct CharacterState
     public void WritePacket(Packet _packet)
     {
         _packet.Write(position);
-        _packet.Write(rotation);
+        NetworkOptimization.WriteCompressedRotation(_packet, rotation);
         _packet.Write(moveNum);
         _packet.Write(timestamp);
     }
@@ -117,7 +117,7 @@ public struct CharacterState
     public void Readpacket(Packet _packet, System.Action onFinished = null)
     {
         position = _packet.ReadVector3();
-        rotation = _packet.ReadQuaternion();
+        rotation = NetworkOptimization.ReadCompressedRotation(_packet);
         moveNum = _packet.ReadInt();
         timestamp = _packet.ReadInt();
 

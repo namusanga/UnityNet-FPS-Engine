@@ -8,14 +8,23 @@ public struct CharacterInput
     public int inputNum;//the number of this input
     public Vector3 predictedResult;//predicted result if any
     public Quaternion rotation;//rotation of character when this input was made
+    public bool shoot;//has the player shot this frame
+    //SHOOT PARAMETERS
+    public Quaternion myRotation;
+    public int localTickForShotPlayer;
+    public int shotPlayer;
 
 
-    public CharacterInput(Vector2 _dir, int _inputNum, Vector3 _predictedPosition, Quaternion _rotation)
+    public CharacterInput(Vector2 _dir, int _inputNum, Vector3 _predictedPosition, Quaternion _rotation, bool _shoot, Quaternion _myRotation, int _localTickForRemotePlayer, int _shotPlayer)
     {
         dir = _dir;
         inputNum = _inputNum;
         predictedResult = _predictedPosition;
         rotation = _rotation;
+        shoot = _shoot;
+        myRotation = _myRotation;
+        localTickForShotPlayer = _localTickForRemotePlayer;
+        shotPlayer = _shotPlayer;
     }
 
     /// <summary>
@@ -29,6 +38,14 @@ public struct CharacterInput
         _packet.Write(inputNum);
         _packet.Write(predictedResult);
         _packet.Write(rotation);
+        _packet.Write(shoot);
+        if (shoot)
+        {
+            //serialize shoot parameters
+            _packet.Write(myRotation);
+            _packet.Write(localTickForShotPlayer);
+            _packet.Write(shotPlayer);
+        }
     }
 
 
@@ -42,5 +59,13 @@ public struct CharacterInput
         inputNum = _packet.ReadInt();
         predictedResult = _packet.ReadVector3();
         rotation = _packet.ReadQuaternion();
+        shoot = _packet.ReadBool();
+        if (shoot)
+        {
+            //deserialize shoot parameters
+            myRotation = _packet.ReadQuaternion();
+            localTickForShotPlayer = _packet.ReadInt();
+            shotPlayer = _packet.ReadInt();
+        }
     }
 }
