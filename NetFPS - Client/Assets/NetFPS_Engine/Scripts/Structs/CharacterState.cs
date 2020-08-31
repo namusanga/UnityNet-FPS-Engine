@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 
 /// <summary>
@@ -64,11 +63,7 @@ public struct CharacterState
 
         //calculate movement vector
         //horizontal movement
-        Vector3 movement = (_transformToMove.forward * Time.fixedDeltaTime * input.dir.y)
-                           //vertical movement
-                           + (_transformToMove.right * Time.fixedDeltaTime * input.dir.x);
-
-        movement *= speed;
+        Vector3 movement = GetMovement(_transformToMove, input, speed);
 
 
         //calculate the next movement
@@ -85,6 +80,20 @@ public struct CharacterState
         return state;
     }
 
+    public static Vector3 GetMovement(Transform _transformToMove, CharacterInput _input, float _speed)
+    {
+        float _gravityPull = GameSettings.Instance.gravity * Time.fixedDeltaTime;
+
+        //horizontal movement
+        Vector3 _movement = (_transformToMove.forward * _input.dir.y)
+                          //vertical movement
+                          + (_transformToMove.right * _input.dir.x)
+                          + (_gravityPull * Vector3.up);
+
+        _movement *= (_speed * Time.fixedDeltaTime);
+
+        return _movement;
+    }
     public static bool ValidatePredictedState(Vector3 _prediction, Vector3 _calculatedPosition)
     {
         if (Vector3.Distance(_prediction, _calculatedPosition) < 5)
@@ -96,7 +105,7 @@ public struct CharacterState
     public void WritePacket(Packet _packet)
     {
         _packet.Write(position);
-        NetworkOptimization.WriteCompressedRotation(_packet,rotation);
+        NetworkOptimization.WriteCompressedRotation(_packet, rotation);
         _packet.Write(moveNum);
         _packet.Write(timestamp);
     }

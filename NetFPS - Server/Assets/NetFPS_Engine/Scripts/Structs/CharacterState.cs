@@ -64,13 +64,7 @@ public struct CharacterState
 
         //calculate movement vector
         //horizontal movement
-        Vector3 movement = (_transformToMove.forward * Time.fixedDeltaTime * input.dir.y)
-                           //vertical movement
-                           + (_transformToMove.right * Time.fixedDeltaTime * input.dir.x);
-        
-        movement *= speed;
-
-
+        Vector3 movement = GetMovement(_transformToMove, input, speed);
         //calculate the next movement
         CharacterState state;
         //if the position is valid, accept it
@@ -96,6 +90,21 @@ public struct CharacterState
         }
 
         return state;
+    }
+
+    public static Vector3 GetMovement(Transform _transformToMove, CharacterInput _input, float _speed)
+    {
+        float _gravityPull = GameSettings.Instance.gravity * Time.fixedDeltaTime;
+
+        //horizontal movement
+        Vector3 _movement = (_transformToMove.forward  * _input.dir.y)
+         //vertical movement
+                          + (_transformToMove.right * _input.dir.x) 
+                          + ( _gravityPull * Vector3.up);
+
+        _movement *= (_speed * Time.fixedDeltaTime);
+
+        return _movement;
     }
 
     public static bool ValidatePredictedState(Vector3 _prediction, Vector3 _calculatedPosition)

@@ -38,55 +38,9 @@ public class Player : MonoBehaviour
     /// <summary>Processes player input and moves the player.</summary>
     public void FixedUpdate()
     {
-        //if (health <= 0f)
-        //{
-        //    return;
-        //}
 
-        //Vector2 _inputDirection = Vector2.zero;
-        //if (inputs[0])
-        //{
-        //    _inputDirection.y += 1;
-        //}
-        //if (inputs[1])
-        //{
-        //    _inputDirection.y -= 1;
-        //}
-        //if (inputs[2])
-        //{
-        //    _inputDirection.x -= 1;
-        //}
-        //if (inputs[3])
-        //{
-        //    _inputDirection.x += 1;
-        //}
-
-        //Move(_inputDirection);
     }
-
-    /// <summary>Calculates the player's desired movement direction and moves him.</summary>
-    /// <param name="_inputDirection"></param>
-    private void Move(Vector2 _inputDirection)
-    {
-        //Vector3 _moveDirection = transform.right * _inputDirection.x + transform.forward * _inputDirection.y;
-        //_moveDirection *= moveSpeed;
-
-        //if (controller.isGrounded)
-        //{
-        //    yVelocity = 0f;
-        //    if (inputs[4])
-        //    {
-        //        yVelocity = jumpSpeed;
-        //    }
-        //}
-        //yVelocity += gravity;
-
-        //_moveDirection.y = yVelocity;
-        //controller.Move(_moveDirection);
-
-        //ServerSend.PlayerPosition(this);
-        //ServerSend.PlayerRotation(this);
-    }
+   
 
     /// <summary>Updates the player input with newly received input.</summary>
     /// <param name="_inputs">The new key inputs.</param>

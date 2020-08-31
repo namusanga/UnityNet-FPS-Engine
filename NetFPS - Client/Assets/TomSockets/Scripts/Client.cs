@@ -44,7 +44,7 @@ public class Client : MonoBehaviour
     private IEnumerator AutoConnect()
     {
         //Autoconnect
-        Logger.Logger.Log(Logger.LogModeOptions.Verbose, $"Auto connecting...");
+        Logger.Logger.Log(Logger.LogModeOptions.Full, $"Auto connecting...");
         yield return new WaitForSeconds(.2f);
         UIManager.instance.ConnectToServer();
     }

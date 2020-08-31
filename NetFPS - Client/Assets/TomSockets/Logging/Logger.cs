@@ -5,7 +5,6 @@ using UnityEditor;
 
 namespace Logger
 {
-
     [CreateAssetMenu(fileName = "Logging/LoggerAsset", menuName = "LoggerData", order = 0)]
     public class Logger : SingletonScriptableObject<Logger>
     {
@@ -29,19 +28,13 @@ namespace Logger
         [MenuItem("Tools/Create Logger Reference")]
         public static void CreateloggerRefferenceInScene()
         {
-            GameObject loggerRef = Object.Instantiate(Resources.Load("LoggerRef") as GameObject);
-        }
+            //create the holder if none
+            if (GameObject.Find("SinglatonsHolder") == null)
+                new GameObject("SinglatonsHolder");
 
-
-        static int num = 0;
-        /// <summary>
-        /// will add a reference to the logger into this scene
-        /// </summary>
-        [MenuItem("Tools/Log Item")]
-        public static void LogItem()
-        {
-            num++;
-            Debug.Log("hello_" + num);
+            GameObject singlatonHolders = GameObject.Find("SinglatonsHolder");
+            GameObject loggerRef = Object.Instantiate(Resources.Load("LoggerRef") as GameObject, singlatonHolders.transform);
+            loggerRef.name = "LoggerRef";
         }
     }
 #endif
@@ -51,6 +44,6 @@ namespace Logger
     {
         Minimal,
         Partial,
-        Verbose
+        Full
     }
 }

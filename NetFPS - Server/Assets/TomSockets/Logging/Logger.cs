@@ -28,7 +28,13 @@ public class LoggerEditor
     [MenuItem("Tools/Create Logger Reference")]
     public static void CreateloggerRefferenceInScene()
     {
-        GameObject loggerRef = Object.Instantiate(Resources.Load("LoggerRef") as GameObject);
+        //create the holder if none
+        if (GameObject.Find("SinglatonsHolder") == null)
+            new GameObject("SinglatonsHolder");
+
+        GameObject singlatonHolders = GameObject.Find("SinglatonsHolder");
+        GameObject loggerRef = Object.Instantiate(Resources.Load("LoggerRef") as GameObject, singlatonHolders.transform);
+        loggerRef.name = "LoggerRef";
     }
 }
 #endif
