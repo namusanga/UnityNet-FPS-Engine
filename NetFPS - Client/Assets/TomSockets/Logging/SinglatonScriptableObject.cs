@@ -1,12 +1,9 @@
-using System.Linq;
-using UnityEngine;
+﻿using System.Linq;
+using UnityEditor;
 
-/// <summary>
-/// Abstract class for making reload-proof singletons out of ScriptableObjects
-/// Returns the asset created on the editor, or null if there is none
-/// Based on https://www.youtube.com/watch?v=VBA1QCoEAX4
-/// </summary>
-/// <typeparam name="T">Singleton type</typeparam>
+#if UNITY_EDITOR
+using UnityEngine;
+#endif
 
 public abstract class SingletonScriptableObject<T> : ScriptableObject where T : ScriptableObject
 {
