@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Net;
 using System.Net.Sockets;
-using System;
+using UnityEngine;
 public class Client : MonoBehaviour
 {
     public static Client instance;
@@ -91,7 +91,7 @@ public class Client : MonoBehaviour
 
             if (!socket.Connected)
             {
-                
+
                 return;
             }
 
@@ -324,7 +324,8 @@ public class Client : MonoBehaviour
         {
             isConnected = false;
             tcp.socket.Close();
-            udp.socket.Close();
+            if (udp.socket != null)
+                udp.socket.Close();
 
             Debug.Log("Disconnected from server.");
         }
