@@ -93,7 +93,7 @@ public class ServerSend
     /// <summary>Tells a client to spawn a player.</summary>
     /// <param name="_toClient">The client that should spawn the player.</param>
     /// <param name="_player">The player to spawn.</param>
-    public static void SpawnPlayer(int _toClient, Player _player)
+    public static void SpawnPlayer(int _toClient, NetPlayer _player)
     {
         using (Packet _packet = new Packet((int)ServerPackets.spawnPlayer))
         {
@@ -108,28 +108,16 @@ public class ServerSend
 
     /// <summary>Sends a player's updated position to all clients.</summary>
     /// <param name="_player">The player whose position to update.</param>
-    public static void PlayerPosition(Player _player)
+    public static void PlayerPosition(NetPlayer _player)
     {
-        //using (Packet _packet = new Packet((int)ServerPackets.playerPosition))
-        //{
-        //    _packet.Write(_player.id);
-        //    _packet.Write(_player.transform.position);
-
-        //    SendUDPDataToAll(_packet);
-        //}
+       
     }
 
     /// <summary>Sends a player's updated rotation to all clients except to himself (to avoid overwriting the local player's rotation).</summary>
     /// <param name="_player">The player whose rotation to update.</param>
-    public static void PlayerRotation(Player _player)
+    public static void PlayerRotation(NetPlayer _player)
     {
-        //using (Packet _packet = new Packet((int)ServerPackets.playerRotation))
-        //{
-        //    _packet.Write(_player.id);
-        //    _packet.Write(_player.transform.rotation);
-
-        //    SendUDPDataToAll(_player.id, _packet);
-        //}
+        
     }
 
     public static void PlayerDisconnected(int _playerId)
@@ -142,7 +130,7 @@ public class ServerSend
         }
     }
 
-    public static void PlayerHealth(Player _player)
+    public static void PlayerHealth(NetPlayer _player)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerHealth))
         {
@@ -153,7 +141,7 @@ public class ServerSend
         }
     }
 
-    public static void PlayerRespawned(Player _player)
+    public static void PlayerRespawned(NetPlayer _player)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerRespawned))
         {

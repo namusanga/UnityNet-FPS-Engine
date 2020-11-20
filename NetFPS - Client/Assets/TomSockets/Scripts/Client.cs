@@ -6,31 +6,33 @@ using System.Net.Sockets;
 using UnityEngine;
 public class Client : MonoBehaviour
 {
-    public static Client instance;
-    public static int dataBufferSize = 4096;
+    //Public
+    public delegate void PacketHandler(Packet _packet);
+    public static Dictionary<int, PacketHandler> packetHandlers;
 
+    //Public Accessors
+    public static Client Active
+    {
+        get
+        {
+            if (_active == null)
+                _active = FindObjectOfType<Client>();
+            return _active;
+        }
+    }
+    public static Client _active;
+    public static bool Connected => Active == null || Active.isConnected;
+
+    //Private
+    private bool isConnected = false;
+
+    //Setttings
+    public static int dataBufferSize = 4096;
     public string ip = "127.0.0.1";
     public int port = 26950;
     public int myId = 0;
     public TCP tcp;
     public UDP udp;
-
-    private bool isConnected = false;
-    public delegate void PacketHandler(Packet _packet);
-    public static Dictionary<int, PacketHandler> packetHandlers;
-
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Debug.Log("Instance already exists, destroying object!");
-            Destroy(this);
-        }
-    }
 
     private void Start()
     {
@@ -45,8 +47,9 @@ public class Client : MonoBehaviour
     {
         //Autoconnect
         Logger.Logger.Log(Logger.LogModeOptions.Full, $"Auto connecting...");
-        yield return new WaitForSeconds(.2f);
-        UIManager.instance.ConnectToServer();
+        yield return null;
+        //tell the client to connect to the server
+       ConnectToServer();
     }
 
     private void OnApplicationQuit()
@@ -59,8 +62,17 @@ public class Client : MonoBehaviour
     {
         InitializeClientData();
 
-        isConnected = true;
-        tcp.Connect(); // Connect tcp, udp gets connected once tcp is done
+        if (!GameSettings.Instance.offline)
+        {
+            isConnected = true;
+            tcp.Connect(); // Connect tcp, udp gets connected once tcp is done
+        }
+        
+        //spawn a player to be used during the offline mode
+        else
+        {
+            GameManager.instance.SpawnPlayer(myId, "offline", Vector3.zero, Quaternion.identity);
+        }
     }
 
     public class TCP
@@ -81,17 +93,18 @@ public class Client : MonoBehaviour
             };
 
             receiveBuffer = new byte[dataBufferSize];
-            socket.BeginConnect(instance.ip, instance.port, ConnectCallback, socket);
+            socket.BeginConnect(Active.ip, Active.port, ConnectCallback, socket);
         }
 
-        /// <summary>Initializes the newly connected client's TCP-related info.</summary>
+        /// <summary>
+        /// Initializes the newly connected client's TCP-related info.
+        /// </summary>
         private void ConnectCallback(IAsyncResult _result)
         {
             socket.EndConnect(_result);
 
             if (!socket.Connected)
             {
-
                 return;
             }
 
@@ -127,7 +140,7 @@ public class Client : MonoBehaviour
                 int _byteLength = stream.EndRead(_result);
                 if (_byteLength <= 0)
                 {
-                    instance.Disconnect();
+                    Active.Disconnect();
                     return;
                 }
 
@@ -199,7 +212,7 @@ public class Client : MonoBehaviour
         /// <summary>Disconnects from the server and cleans up the TCP connection.</summary>
         private void Disconnect()
         {
-            instance.Disconnect();
+            Active.Disconnect();
 
             stream = null;
             receivedData = null;
@@ -215,7 +228,7 @@ public class Client : MonoBehaviour
 
         public UDP()
         {
-            endPoint = new IPEndPoint(IPAddress.Parse(instance.ip), instance.port);
+            endPoint = new IPEndPoint(IPAddress.Parse(Active.ip), Active.port);
         }
 
         /// <summary>Attempts to connect to the server via UDP.</summary>
@@ -239,7 +252,7 @@ public class Client : MonoBehaviour
         {
             try
             {
-                _packet.InsertInt(instance.myId); // Insert the client's ID at the start of the packet
+                _packet.InsertInt(Active.myId); // Insert the client's ID at the start of the packet
                 if (socket != null)
                 {
                     socket.BeginSend(_packet.ToArray(), _packet.Length(), null, null);
@@ -261,7 +274,7 @@ public class Client : MonoBehaviour
 
                 if (_data.Length < 4)
                 {
-                    instance.Disconnect();
+                    Active.Disconnect();
                     return;
                 }
 
@@ -296,7 +309,7 @@ public class Client : MonoBehaviour
         /// <summary>Disconnects from the server and cleans up the UDP connection.</summary>
         private void Disconnect()
         {
-            instance.Disconnect();
+            Active.Disconnect();
 
             endPoint = null;
             socket = null;
@@ -312,9 +325,11 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.spawnPlayer, ClientHandle.SpawnPlayer },
             { (int)ServerPackets.playerDisconnected, ClientHandle.PlayerDisconnected },
             { (int)ServerPackets.playerHealth, ClientHandle.PlayerHealth },
-            { (int)ServerPackets.playerRespawned, ClientHandle.PlayerRespawned }
+            { (int)ServerPackets.playerRespawned, ClientHandle.PlayerRespawned },
+            {
+                (int)ServerPackets.initScene, InitScenePacker.Active.OnInitScene
+            }
         };
-        Debug.Log("Initialized packets.");
     }
 
     /// <summary>Disconnects from the server and stops all network traffic.</summary>

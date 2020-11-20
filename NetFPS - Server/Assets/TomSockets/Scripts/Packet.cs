@@ -8,12 +8,13 @@ using UnityEngine;
 public enum ServerPackets
 {
     welcome = 1,
+    initScene,
     spawnPlayer,
     playerDisconnected,
     playerHealth,
     playerRespawned,
-    BroadcastPlayerState,
-    PlayerShot
+    broadcastPlayerState,
+    playerShot,
 }
 
 /// <summary>Sent from client to server.</summary>
@@ -25,9 +26,9 @@ public enum ClientPackets
 
 public class Packet : IDisposable
 {
-    public List<byte> buffer { get; private set; }
-    public byte[] readableBuffer { get; private set; }
-    public int readPos { get; private set; }
+    public List<byte> buffer { get; protected set; }
+    public byte[] readableBuffer { get; protected set; }
+    public int readPos { get; protected set; }
 
     /// <summary>Creates a new empty packet (without an ID).</summary>
     public Packet()

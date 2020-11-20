@@ -9,7 +9,7 @@ public class ClientSend : MonoBehaviour
     public static void SendTCPData(Packet _packet)
     {
         _packet.WriteLength();
-        Client.instance.tcp.SendData(_packet);
+        Client.Active.tcp.SendData(_packet);
     }
 
     /// <summary>Sends a packet to the server via UDP.</summary>
@@ -17,7 +17,7 @@ public class ClientSend : MonoBehaviour
     public static void SendUDPData(Packet _packet)
     {
         _packet.WriteLength();
-        Client.instance.udp.SendData(_packet);
+        Client.Active.udp.SendData(_packet);
     }
 
     #region Packets
@@ -26,7 +26,7 @@ public class ClientSend : MonoBehaviour
     {
         using (Packet _packet = new Packet((int)ClientPackets.welcomeReceived))
         {
-            _packet.Write(Client.instance.myId);
+            _packet.Write(Client.Active.myId);
             _packet.Write(UIManager.instance.usernameField.text);
 
             SendTCPData(_packet);
@@ -37,27 +37,12 @@ public class ClientSend : MonoBehaviour
     /// <param name="_inputs"></param>
     public static void PlayerMovement(bool[] _inputs)
     {
-        //using (Packet _packet = new Packet((int)ClientPackets.playerMovement))
-        //{
-        //    _packet.Write(_inputs.Length);
-        //    foreach (bool _input in _inputs)
-        //    {
-        //        _packet.Write(_input);
-        //    }
-        //    _packet.Write(GameManager.players[Client.instance.myId].transform.rotation);
-
-        //    SendUDPData(_packet);
-        //}
+       
     }
 
     public static void PlayerShoot(Vector3 _facing)
     {
-        //using (Packet _packet = new Packet((int)ClientPackets.playerShoot))
-        //{
-        //    _packet.Write(_facing);
-
-        //    SendTCPData(_packet);
-        //}
+        
     }
     #endregion
 }

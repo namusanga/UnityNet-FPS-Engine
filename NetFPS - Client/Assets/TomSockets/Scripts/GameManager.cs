@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -31,19 +30,23 @@ public class GameManager : MonoBehaviour
     /// <param name="_rotation">The player's starting rotation.</param>
     public void SpawnPlayer(int _id, string _username, Vector3 _position, Quaternion _rotation)
     {
-        GameObject _player;
-        if (_id == Client.instance.myId)
+        if (GameSettings.Instance.instantiateLocalPlayer)
         {
-            _player = Instantiate(localPlayerPrefab, _position, _rotation);
-        }
-        else
-        {
-            _player = Instantiate(playerPrefab, _position, _rotation);
-            _player.transform.position = _position;
-            print(_position);
-        }
 
-        _player.GetComponent<PlayerInfo>().Initialize(_id, _username);
-        players.Add(_id, _player.GetComponent<PlayerInfo>());
+            GameObject _player;
+            if (_id == Client.Active.myId)
+            {
+                _player = Instantiate(localPlayerPrefab, _position, _rotation);
+            }
+            else
+            {
+                _player = Instantiate(playerPrefab, _position, _rotation);
+                _player.transform.position = _position;
+                print(_position);
+            }
+
+            _player.GetComponent<PlayerInfo>().Initialize(_id, _username);
+            players.Add(_id, _player.GetComponent<PlayerInfo>());
+        }
     }
 }

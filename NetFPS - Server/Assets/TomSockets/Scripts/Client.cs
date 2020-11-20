@@ -10,7 +10,7 @@ public class Client
     public static int dataBufferSize = 4096;
 
     public int id;
-    public Player player;
+    public NetPlayer player;
     public TCP tcp;
     public UDP udp;
 
@@ -207,7 +207,8 @@ public class Client
             endPoint = null;
         }
     }
-
+    
+    
     /// <summary>Sends the client into the game and informs other clients of the new player.</summary>
     /// <param name="_playerName">The username of the new player.</param>
     public void SendIntoGame(string _playerName)
@@ -215,7 +216,7 @@ public class Client
         player = NetworkManager.instance.InstantiatePlayer();
         player.Initialize(id, _playerName);
 
-        // Send all players to the new player
+        // Send all players in the new player's scene
         foreach (Client _client in Server.clients.Values)
         {
             if (_client.player != null)
@@ -227,7 +228,7 @@ public class Client
             }
         }
 
-        // Send the new player to all players (including himself)
+        // Send the new player in all playerss scenes (including himself)
         foreach (Client _client in Server.clients.Values)
         {
             if (_client.player != null)
